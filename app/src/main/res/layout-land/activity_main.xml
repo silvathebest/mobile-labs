@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <TextView
+        android:id="@+id/selectedTextView"
+        android:layout_toEndOf="@id/list"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        />
+
+    <Button
+        android:id="@+id/btnAdd"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textBox"
+        android:layout_alignEnd="@id/selectedTextView"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="120dp"
+        android:backgroundTint="@color/teal_200"
+        android:text="Add fruits"
+        android:textSize="14sp"
+        tools:ignore="TouchTargetSizeCheck" />
+
+    <Button
+        android:id="@+id/btnShowList"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/btnAdd"
+        android:layout_alignEnd="@id/selectedTextView"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="120dp"
+        android:backgroundTint="@color/teal_200"
+        android:text="View selected fruit" />
+
+    <Button
+        android:id="@+id/btnResetAll"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/btnShowList"
+        android:layout_alignEnd="@id/selectedTextView"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="120dp"
+        android:backgroundTint="@color/teal_200"
+        android:text="Reset fruits"
+        android:textSize="14sp"
+        tools:ignore="TouchTargetSizeCheck" />
+
+    <Button
+        android:id="@+id/btnSelectAll"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/btnResetAll"
+        android:layout_alignEnd="@id/selectedTextView"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="120dp"
+        android:backgroundTint="@color/teal_200"
+        android:text="Check all fruits"
+        android:textSize="14sp"
+        tools:ignore="TouchTargetSizeCheck" />
+
+    <ListView
+        android:id="@+id/list"
+        android:layout_width="300dp"
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        android:cacheColorHint="@color/white"
+        android:choiceMode="multipleChoice"
+        app:layout_constraintBottom_toTopOf="@+id/btnAdd" />
+
+    <AutoCompleteTextView
+        android:id="@+id/textBox"
+        android:layout_width="400dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/selectedTextView"
+        android:layout_alignEnd="@id/selectedTextView"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="50dp"
+        android:hint="Banana"
+        android:minHeight="48dp" />
+
+</RelativeLayout>
