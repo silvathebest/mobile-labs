@@ -1,86 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <TextView
-        android:id="@+id/selectedTextView"
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/main_fragment"
+        android:name="com.example.labs.MainFragment"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_below="@+id/list" />
-
-    <Button
-        android:id="@+id/btnAdd"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/textBox"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:layout_marginTop="20dp"
-        android:backgroundTint="@color/teal_200"
-        android:text="Добавить фрукт"
-        android:textSize="14sp"
-        tools:ignore="TouchTargetSizeCheck" />
-
-    <Button
-        android:id="@+id/btnShowList"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/btnAdd"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:layout_marginTop="20dp"
-        android:backgroundTint="@color/teal_200"
-        android:text="Вывод выбранных фруктов"
-        app:layout_constraintStart_toEndOf="@+id/btnSelectAll" />
-
-    <Button
-        android:id="@+id/btnResetAll"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/btnShowList"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:layout_marginTop="20dp"
-        android:backgroundTint="@color/teal_200"
-        android:text="Сбросить все фрукты"
-        android:textSize="14sp"
-        tools:ignore="TouchTargetSizeCheck" />
-
-    <Button
-        android:id="@+id/btnSelectAll"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/btnResetAll"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:layout_marginTop="20dp"
-        android:backgroundTint="@color/teal_200"
-        android:text="Выбрать все фрукты"
-        android:textSize="14sp"
-        tools:ignore="TouchTargetSizeCheck" />
-
-    <ListView
-        android:id="@+id/list"
-        android:layout_width="match_parent"
-        android:layout_height="300dp"
-        android:background="@color/white"
-        android:cacheColorHint="@color/white"
-        android:choiceMode="multipleChoice"
-        app:layout_constraintBottom_toTopOf="@+id/btnAdd" />
-
-    <AutoCompleteTextView
-        android:id="@+id/textBox"
-        android:layout_width="300dp"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/selectedTextView"
-        android:layout_centerInParent="true"
-        android:layout_marginTop="20dp"
-        android:hint="Банан"
-        android:minHeight="48dp"
-        app:layout_constraintTop_toBottomOf="@+id/list" />
-
+        android:layout_height="match_parent" />
 </RelativeLayout>
