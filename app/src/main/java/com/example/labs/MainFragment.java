@@ -1,6 +1,7 @@
 package com.example.labs;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -14,8 +15,10 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.ListIterator;
@@ -24,8 +27,8 @@ public class MainFragment extends Fragment {
     Button btnAdd;
     Button btnSelectAll;
     Button btnResetAll;
-    Button btnShowList;
     Button btnDelete;
+    Button btnSearch;
     TextView selectedTextView;
     public ListView list;
     public static final ArrayList<String> listItems = new ArrayList<>();
@@ -38,7 +41,6 @@ public class MainFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
         View v = inflater.inflate(R.layout.fragment_main, container, false);
         list = v.findViewById(R.id.list);
         //создаем adapter для добавления записей в listView
@@ -79,14 +81,6 @@ public class MainFragment extends Fragment {
                         list.setItemChecked(i, false);
                     }
                     break;
-                case R.id.btnShowList:
-                    StringBuilder selectedItems = new StringBuilder();
-                    for (int i = 0; i < listItems.size(); i++) {
-                        if (selected.get(i))
-                            selectedItems.append(listItems.get(i)).append(" ");
-                    }
-                    selectedTextView.setText(selectedItems.toString());
-                    break;
                 case R.id.btnDelete:
                     ArrayList<String> checkedItems = new ArrayList<>();
                     for (int i = 0; i < list.getCount(); i++) {
@@ -98,21 +92,39 @@ public class MainFragment extends Fragment {
                     adapter.notifyDataSetChanged();
                     list.clearChoices();
                     break;
+                case R.id.btnSearch:
+                    String searchString = selectedTextView.getText().toString().toLowerCase().trim();
+                    if (searchString.equals("")) {
+                        Toast.makeText(v.getContext(), "Заполните поле поиска", Toast.LENGTH_LONG).show();
+                        return;
+                    }
+                    ArrayList<String> searchResultString = new ArrayList<>();
+                    for (int i = 0; i < list.getCount(); i++) {
+                        if (listItems.get(i).toLowerCase().contains(searchString)) {
+                            searchResultString.add(listItems.get(i));
+                        }
+                    }
+                    if (searchResultString.size() == 0) {
+                        Toast.makeText(v.getContext(), "Результатов не найдено", Toast.LENGTH_LONG).show();
+                        return;
+                    }
+                    Intent intent = new Intent(getActivity(), SearchActivityResult.class);
+                    intent.putExtra("SearchResult", searchResultString);
+                    startActivity(intent);
             }
         };
-
 
         //назначем событие на кнопки
         btnAdd = v.findViewById(R.id.btnAdd);
         btnSelectAll = v.findViewById(R.id.btnSelectAll);
         btnResetAll = v.findViewById(R.id.btnResetAll);
-        btnShowList = v.findViewById(R.id.btnShowList);
         btnDelete = v.findViewById(R.id.btnDelete);
+        btnSearch = v.findViewById(R.id.btnSearch);
         btnAdd.setOnClickListener(clickButtons);
         btnSelectAll.setOnClickListener(clickButtons);
         btnResetAll.setOnClickListener(clickButtons);
-        btnShowList.setOnClickListener(clickButtons);
         btnDelete.setOnClickListener(clickButtons);
+        btnSearch.setOnClickListener(clickButtons);
         // Inflate the layout for this fragment
         return v;
     }
