@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<fruits>
+    <fruit>
+        <name>Tom</name>
+        <price>36</price>
+    </fruit>
+    <fruit>
+        <name>Alice</name>
+        <price>32</price>
+    </fruit>
+    <fruit>
+        <name>Bob</name>
+        <price>28</price>
+    </fruit>
+</fruits>

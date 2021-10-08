@@ -1,38 +1,49 @@
 package com.example.labs;
 
+import static com.example.labs.FruitAdapter.checkedArray;
+
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.ListIterator;
 
 public class MainFragment extends Fragment {
     Button btnAdd;
-    Button btnSelectAll;
-    Button btnResetAll;
     Button btnDelete;
     Button btnSearch;
+    Button btnLoad;
     TextView selectedTextView;
-    public ListView list;
-    public static final ArrayList<String> listItems = new ArrayList<>();
-    public static ArrayAdapter<String> adapter = null;
+    public static SharedPreferences sPref;
+    public static ArrayList<JSONObject> SearchArrayResult;
+
+    @SuppressLint("StaticFieldLeak")
+    public static ListView list;
+    public static ArrayList<JSONObject> listItems = new ArrayList<>();
+    public static ArrayAdapter<JSONObject> adapter = null;
+    public static FragmentManager fm;
 
     public MainFragment() {
         // Required empty public constructor
@@ -43,27 +54,18 @@ public class MainFragment extends Fragment {
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_main, container, false);
         list = v.findViewById(R.id.list);
+        sPref = getActivity().getPreferences(Context.MODE_PRIVATE);
         //создаем adapter для добавления записей в listView
-        adapter = new ArrayAdapter<>(v.getContext(),
-                android.R.layout.simple_list_item_multiple_choice, listItems);
+        adapter = new FruitAdapter(getContext(), R.layout.raw, R.id.name, listItems);
         list.setAdapter(adapter);
-        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        list.setOnItemLongClickListener((parent, v1, position, id) -> {
-            // по позиции получаем выбранный элемент
-            String selectedItem = listItems.get(position);
-            // установка текста элемента TextView
-            AddEditFragment editFragment = new AddEditFragment(selectedItem, position);
-            fragmentTransaction.replace(R.id.main_fragment, editFragment, "tag");
-            fragmentTransaction.addToBackStack(null);
-            fragmentTransaction.commit();
-            return false;
-        });
+        fm = getActivity().getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fm.beginTransaction();
 
+        if (listItems.size() == 0) loadData();
 
         selectedTextView = v.findViewById(R.id.selectedTextView);
+
         @SuppressLint({"NonConstantResourceId", "SetTextI18n"}) View.OnClickListener clickButtons = view -> {
-            SparseBooleanArray selected = list.getCheckedItemPositions();
             switch (view.getId()) {
                 case R.id.btnAdd:
                     AddEditFragment addFragment = new AddEditFragment();
@@ -71,61 +73,125 @@ public class MainFragment extends Fragment {
                     fragmentTransaction.addToBackStack(null);
                     fragmentTransaction.commit();
                     break;
-                case R.id.btnSelectAll:
-                    for (int i = 0; i < listItems.size(); i++) {
-                        list.setItemChecked(i, true);
-                    }
-                    break;
-                case R.id.btnResetAll:
-                    for (int i = 0; i < listItems.size(); i++) {
-                        list.setItemChecked(i, false);
-                    }
-                    break;
                 case R.id.btnDelete:
-                    ArrayList<String> checkedItems = new ArrayList<>();
-                    for (int i = 0; i < list.getCount(); i++) {
-                        if (selected.get(i)) {
-                            checkedItems.add(listItems.get(i));
-                        }
-                    }
-                    listItems.removeAll(checkedItems);
-                    adapter.notifyDataSetChanged();
-                    list.clearChoices();
+                    listItems.removeAll(checkedArray);
+                    adapter = new FruitAdapter(getContext(), R.layout.raw, R.id.name, listItems);
+                    list.setAdapter(adapter);
+                    checkedArray = new ArrayList<>();
+                    saveData();
                     break;
                 case R.id.btnSearch:
                     String searchString = selectedTextView.getText().toString().toLowerCase().trim();
+
                     if (searchString.equals("")) {
                         Toast.makeText(v.getContext(), "Заполните поле поиска", Toast.LENGTH_LONG).show();
                         return;
                     }
-                    ArrayList<String> searchResultString = new ArrayList<>();
+
+                    SearchArrayResult = new ArrayList<>();
+
                     for (int i = 0; i < list.getCount(); i++) {
-                        if (listItems.get(i).toLowerCase().contains(searchString)) {
-                            searchResultString.add(listItems.get(i));
+                        try {
+                            if (listItems.get(i).get("name").toString().toLowerCase().contains(searchString) ||
+                                    listItems.get(i).get("price").toString().toLowerCase().contains(searchString)) {
+                                SearchArrayResult.add(listItems.get(i));
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
                         }
                     }
-                    if (searchResultString.size() == 0) {
+
+                    if (SearchArrayResult.size() == 0) {
                         Toast.makeText(v.getContext(), "Результатов не найдено", Toast.LENGTH_LONG).show();
                         return;
                     }
+
                     Intent intent = new Intent(getActivity(), SearchActivityResult.class);
-                    intent.putExtra("SearchResult", searchResultString);
                     startActivity(intent);
+                    break;
+                case R.id.btnLoad:
+                    try {
+                        String jsonString = getJSonData();
+                        JSONObject obj = new JSONObject(jsonString);
+                        JSONArray array = obj.getJSONArray("fruits");
+                        listItems = getArrayListFromJSONArray(array);
+                        adapter = new FruitAdapter(getContext(), R.layout.raw, R.id.name, listItems);
+                        list.setAdapter(adapter);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
             }
         };
 
         //назначем событие на кнопки
         btnAdd = v.findViewById(R.id.btnAdd);
-        btnSelectAll = v.findViewById(R.id.btnSelectAll);
-        btnResetAll = v.findViewById(R.id.btnResetAll);
         btnDelete = v.findViewById(R.id.btnDelete);
         btnSearch = v.findViewById(R.id.btnSearch);
+        btnLoad = v.findViewById(R.id.btnLoad);
         btnAdd.setOnClickListener(clickButtons);
-        btnSelectAll.setOnClickListener(clickButtons);
-        btnResetAll.setOnClickListener(clickButtons);
         btnDelete.setOnClickListener(clickButtons);
         btnSearch.setOnClickListener(clickButtons);
+        btnLoad.setOnClickListener(clickButtons);
         // Inflate the layout for this fragment
         return v;
+    }
+
+    private String getJSonData() {
+        String json = null;
+        try {
+            InputStream inputStream = getResources().getAssets().open("fruitsData.json");
+            int size = inputStream.available();
+            byte[] data = new byte[size];
+            inputStream.read(data);
+            inputStream.close();
+            json = new String(data, StandardCharsets.UTF_8);
+            //jsonArray = new JSONArray(json);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        //return jsonArray;
+        return json;
+    }
+
+    private ArrayList<JSONObject> getArrayListFromJSONArray(JSONArray jsonArray) {
+        ArrayList<JSONObject> aList = new ArrayList<>();
+        try {
+            if (jsonArray != null) {
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    aList.add(jsonArray.getJSONObject(i));
+                }
+            }
+        } catch (JSONException js) {
+            js.printStackTrace();
+        }
+        return aList;
+    }
+
+    public void saveData() {
+        try {
+            JSONObject obj = new JSONObject();
+            JSONArray arr = new JSONArray(listItems);
+            obj.put("fruits", arr);
+            sPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sPref.edit();
+            editor.putString("data", obj.toString());
+            editor.apply();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    void loadData() {
+        try {
+            String localData = sPref.getString("data", "data");
+            JSONObject obj = new JSONObject(localData);
+            JSONArray array = obj.getJSONArray("fruits");
+            listItems = getArrayListFromJSONArray(array);
+            adapter = new FruitAdapter(getContext(), R.layout.raw, R.id.name, listItems);
+            list.setAdapter(adapter);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -1,0 +1,24 @@
+{
+  "fruits": [
+    {
+      "name": "Apple",
+      "price": 35,
+      "checked": false
+    },
+    {
+      "name": "Banana",
+      "price": 12,
+      "checked": false
+    },
+    {
+      "name": "Grapes",
+      "price": 45,
+      "checked": false
+    },
+    {
+      "name": "Pineapple",
+      "price": 200,
+      "checked": false
+    }
+  ]
+}

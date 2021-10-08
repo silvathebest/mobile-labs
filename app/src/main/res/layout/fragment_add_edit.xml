@@ -9,16 +9,27 @@
     tools:context=".AddEditFragment">
 
     <AutoCompleteTextView
-        android:id="@+id/addEditTextView"
+        android:id="@+id/textBoxAddEditName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:ignore="LabelFor" />
+        android:layout_marginTop="25dp"
+        android:hint="Фрукт"
+        android:minHeight="48dp" />
+
+    <AutoCompleteTextView
+        android:id="@+id/textBoxAddEditPrice"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="25dp"
+        android:hint="Цена"
+        android:minHeight="48dp" />
 
     <Button
-        android:id="@+id/btnSaveChanges"
+        android:id="@+id/btnSave"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:backgroundTint="@color/teal_200"
-        android:text="Save" />
+        android:backgroundTint="@color/cardview_dark_background"
+        android:text="Сохранить"
+        android:textSize="14sp"
+        tools:ignore="TouchTargetSizeCheck" />
 </LinearLayout>
